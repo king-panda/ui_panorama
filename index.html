@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>Panorama Example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+
+      #stage_ui_area{
+        width: 100%;
+        height: 32px;
+        text-align: center;
+        position: fixed;
+        bottom:20px;
+      }
+
+
+      #images{
+        position: fixed;
+        top:50px;
+        left: 50px;
+      }
+      input[type="range"]{
+        position: fixed;
+        top:100px;
+        left: 50px;
+      }
+
+      .fa{
+        width:32px;
+        height:32px;
+        color:#fff;
+        cursor: pointer;
+        margin: 0px 10px;
+      }
+      .fa:hover{
+        opacity: 0.7;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+
+
+      <div id="stage_ui_area">
+
+        <!--<input type="range" name="range">-->
+        <i id="stage_ui_prev" class="fa fa-chevron-circle-left fa-2x" title="前の画像"></i>
+        <i id="stage_ui_next" class="fa fa-chevron-circle-right fa-2x" title="次の画像"></i>
+        <i id="stage_ui_rotate" class="fa fa-undo fa-2x" title="自動回転"></i>
+        <i id="stage_ui_full" class="fa fa-arrows-alt fa-2x" title="全画面表示"></i>
+
+
+      </div>
+
+
+    </div>
+
+
+  <script src="three.min.js"></script>
+  <script src="OrbitControls.js"></script>
+
+
+  <script>
+(function(){
+
+  var width = window.innerWidth,
+      height = window.innerHeight;
+
+  var container;
+
+  var img = new Array("test.jpg"　, "test2.jpg", "test3.jpg");
+  var cnt = 0;
+
+
+
+  //scene
+
+  var scene = new THREE.Scene();
+
+  //mesh
+
+  var geometry = new THREE.SphereGeometry( 5, 60, 40 );
+	geometry.scale( - 1, 1, 1 );
+
+
+	var material = new THREE.MeshBasicMaterial( {
+	   map: THREE.ImageUtils.loadTexture( img[0] )
+	} );
+
+	sphere = new THREE.Mesh( geometry, material );
+
+	scene.add( sphere );
+
+  //camera
+
+  var camera = new THREE.PerspectiveCamera(75, width / height, 1, 1000);
+  camera.position.set(0,0,1.5);
+  camera.lookAt(sphere.position);
+
+  //helper
+
+  var axis = new THREE.AxisHelper(1000);
+  axis.position.set(0,0,0);
+  scene.add(axis);
+
+  //render
+
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize(width,height);
+  renderer.setClearColor({color: 0x000000});
+  container = document.getElementById('stage');
+  container.appendChild(renderer.domElement);
+  renderer.render(scene,camera);
+
+  //control
+
+  var controls = new THREE.OrbitControls(camera,renderer.domElement);
+
+
+  function render(){
+
+
+
+    requestAnimationFrame(render);
+
+    //自動回転
+
+    var autochange = document.getElementById("stage_ui_rotate");
+    autochange.onclick=function(){
+      if(controls.autoRotate){
+        controls.autoRotate = false;
+      }else{
+        controls.autoRotate = true;
+      }
+    }
+
+
+    //画像切り替え
+
+
+    // selection
+    var emptyImg = document.createElement("img");
+
+    var imagePrev = document.getElementById("stage_ui_prev");
+    var imageNext = document.getElementById("stage_ui_next");
+
+    imagePrev.onclick=function(){
+      if (cnt == 0){
+        cnt =(img.length-1);
+      }else{
+        cnt--;
+      }
+      emptyImg.src = img[cnt];
+      material.map = new THREE.Texture(emptyImg);
+      material.map.needsUpdate = true;
+    }
+
+    imageNext.onclick=function(){
+      if (cnt == (img.length-1)){
+        cnt=0;
+      }else{
+        cnt++;
+      }
+      emptyImg.src = img[cnt];
+      material.map = new THREE.Texture(emptyImg);
+      material.map.needsUpdate = true;
+    }
+
+
+
+
+
+
+
+    //画面リサイズ
+    window.addEventListener( 'resize', onWindowResize, false );
+
+
+    var ui_r = document.getElementById('stage_ui_full');
+
+    ui_r.onclick=function(){
+      fullscreen();
+    }
+
+    renderer.render(scene,camera);
+    controls.update();
+  }
+  render();
+
+  function onWindowResize() {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+	}
+
+  function fullscreen() {
+  	if (container.requestFullscreen) {
+  		container.requestFullscreen();
+  	} else if (container.msRequestFullscreen) {
+  		container.msRequestFullscreen();
+  	} else if (container.mozRequestFullScreen) {
+  		container.mozRequestFullScreen();
+  	} else if (container.webkitRequestFullscreen) {
+  		container.webkitRequestFullscreen();
+  	}
+  }
+
+
+
+
+})();
+
+
+  </script>
+  </body>
+</html>
