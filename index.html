@@ -19,8 +19,6 @@
         position: fixed;
         bottom:20px;
       }
-
-
       #images{
         position: fixed;
         top:50px;
@@ -31,7 +29,6 @@
         top:100px;
         left: 50px;
       }
-
       .fa{
         width:32px;
         height:32px;
@@ -66,6 +63,38 @@
 
   <script src="three.min.js"></script>
   <script src="OrbitControls.js"></script>
+  <script src="CopyShader.js"></script>
+    <script src="postprocessing/EffectComposer.js"></script>
+    <script src="postprocessing/MaskPass.js"></script>
+    <script src="postprocessing/RenderPass.js"></script>
+    <script src="postprocessing/ShaderPass.js"></script>
+
+    <script type="x-shader/x-vertex" id="vshader">
+     varying vec2 vUv;
+
+     void main() {
+       vUv = uv;
+       gl_Position = projectionMatrix * modelViewMatrix *
+                     vec4(position, 1.0);
+     }
+   </script>
+
+   <script type="x-shader/x-fragment" id="fshader">
+     uniform sampler2D tDiffuse;
+     varying vec2 vUv;
+
+     void main() {
+  vec3 color = vec3(0.5, 0.5, 0.5);
+  color += texture2D(tDiffuse, vUv).xyz * -4.0;
+  color += texture2D(tDiffuse, vUv + vec2(-1.0/512.0, 0.0)).xyz;
+  color += texture2D(tDiffuse, vUv + vec2( 1.0/512.0, 0.0)).xyz;
+  color += texture2D(tDiffuse, vUv + vec2(0.0, -1.0/512.0)).xyz;
+  color += texture2D(tDiffuse, vUv + vec2(0.0,  1.0/512.0)).xyz;
+  color = step(0.55, color);
+
+  gl_FragColor = vec4(color, 1.0);
+}
+   </script>
 
 
   <script>
@@ -77,7 +106,23 @@
   var container;
 
   var img = new Array("test.jpg"　, "test2.jpg", "test3.jpg");
+  var emptyImg = new Array();
   var cnt = 0;
+
+
+  for (var i = 0; i < (img.length); i++){
+
+  emptyImg[i] = document.createElement("img");
+
+  /*var emptyImg2 = document.createElement("img");
+  var emptyImg3 = document.createElement("img");*/
+  //emptyImg.src = img[cnt];
+  emptyImg[i].src = img[i];
+
+  /*emptyImg2.src = "test2.jpg";
+  emptyImg3.src = "test3.jpg";*/
+
+  }
 
 
 
@@ -92,7 +137,8 @@
 
 
 	var material = new THREE.MeshBasicMaterial( {
-	   map: THREE.ImageUtils.loadTexture( img[0] )
+    //color: 0xffffff, specular: 0xcccccc, shininess:50, ambient: 0xffffff,
+	   map: THREE.ImageUtils.loadTexture( emptyImg[0].src )
 	} );
 
 	sphere = new THREE.Mesh( geometry, material );
@@ -125,11 +171,29 @@
   var controls = new THREE.OrbitControls(camera,renderer.domElement);
 
 
+
+
+  // ポストプロセスの設定
+      var composer = new THREE.EffectComposer(renderer);
+      composer.addPass(new THREE.RenderPass(scene, camera));
+
+      // オリジナルのポストプロセスを追加
+      composer.addPass(new THREE.ShaderPass({
+        vertexShader: document.getElementById('vshader').textContent,
+        fragmentShader: document.getElementById('fshader').textContent,
+        uniforms: { tDiffuse: { type:"t", value:null } },
+      }));
+
+      var toScreen = new THREE.ShaderPass(THREE.CopyShader);
+      toScreen.renderToScreen = true;
+      composer.addPass(toScreen);
+
   function render(){
 
 
 
     requestAnimationFrame(render);
+
 
     //自動回転
 
@@ -147,35 +211,11 @@
 
 
     // selection
-    var emptyImg = document.createElement("img");
+    //var emptyImg = document.createElement("img");
+    //emptyImg.crossOrigin = 'anonymous';
 
     var imagePrev = document.getElementById("stage_ui_prev");
     var imageNext = document.getElementById("stage_ui_next");
-
-    imagePrev.onclick=function(){
-      if (cnt == 0){
-        cnt =(img.length-1);
-      }else{
-        cnt--;
-      }
-      emptyImg.src = img[cnt];
-      material.map = new THREE.Texture(emptyImg);
-      material.map.needsUpdate = true;
-    }
-
-    imageNext.onclick=function(){
-      if (cnt == (img.length-1)){
-        cnt=0;
-      }else{
-        cnt++;
-      }
-      emptyImg.src = img[cnt];
-      material.map = new THREE.Texture(emptyImg);
-      material.map.needsUpdate = true;
-    }
-
-
-
 
 
 
@@ -186,12 +226,20 @@
 
     var ui_r = document.getElementById('stage_ui_full');
 
+
     ui_r.onclick=function(){
       fullscreen();
     }
+    composer.render();
 
-    renderer.render(scene,camera);
+    //renderer.render(scene,camera);
     controls.update();
+    imagePrev.onclick=function(){
+      PrevNext("p");
+    }
+    imageNext.onclick=function(){
+      PrevNext("n");
+    }
   }
   render();
 
@@ -213,8 +261,35 @@
   	}
   }
 
+  function PrevNext(e){
+    switch (e) {
+    case "p":
+      cnt == 0 ? cnt =(img.length-1) : cnt--;
+      break;
+    case "n":
+      cnt == (img.length-1) ? cnt=0 : cnt++;
+      /*if (cnt == (img.length-1)){
+        cnt=0;
+      }else{
+        cnt++;
+      }*/
+      break;
+    }
+    material.map = new THREE.Texture(emptyImg[cnt]);
+    material.map.needsUpdate = true;
+  }
 
 
+
+  /*function next(){
+    if (cnt == (img.length-1)){
+      cnt=0;
+    }else{
+      cnt++;
+    }
+    material.map = new THREE.Texture(emptyImg[cnt]);
+    material.map.needsUpdate = true;
+  }*/
 
 })();
 
