@@ -1,0 +1,32 @@
+body {
+  margin: 0px;
+  overflow: hidden;
+}
+
+#stage_ui_area{
+  width: 100%;
+  height: 32px;
+  text-align: center;
+  position: fixed;
+  bottom:20px;
+}
+#images{
+  position: fixed;
+  top:50px;
+  left: 50px;
+}
+input[type="range"]{
+  position: fixed;
+  top:100px;
+  left: 50px;
+}
+.fa{
+  width:32px;
+  height:32px;
+  color:#fff;
+  cursor: pointer;
+  margin: 0px 10px;
+}
+.fa:hover{
+  opacity: 0.7;
+}

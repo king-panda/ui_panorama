@@ -5,42 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
-    <style>
+    <link href="resource/css/style.css" rel="stylesheet">
 
-      body {
-        margin: 0px;
-        overflow: hidden;
-      }
 
-      #stage_ui_area{
-        width: 100%;
-        height: 32px;
-        text-align: center;
-        position: fixed;
-        bottom:20px;
-      }
-      #images{
-        position: fixed;
-        top:50px;
-        left: 50px;
-      }
-      input[type="range"]{
-        position: fixed;
-        top:100px;
-        left: 50px;
-      }
-      .fa{
-        width:32px;
-        height:32px;
-        color:#fff;
-        cursor: pointer;
-        margin: 0px 10px;
-      }
-      .fa:hover{
-        opacity: 0.7;
-      }
-
-    </style>
   </head>
   <body>
     <div id="stage">
@@ -51,7 +18,7 @@
         <!--<input type="range" name="range">-->
         <i id="stage_ui_prev" class="fa fa-chevron-circle-left fa-2x" title="前の画像"></i>
         <i id="stage_ui_next" class="fa fa-chevron-circle-right fa-2x" title="次の画像"></i>
-        <i id="stage_ui_rotate" class="fa fa-undo fa-2x" title="自動回転"></i>
+        <i id="stage_ui_rotate" class="fa fa-pause fa-2x" title="自動回転"></i>
         <i id="stage_ui_full" class="fa fa-arrows-alt fa-2x" title="全画面表示"></i>
 
 
@@ -61,13 +28,13 @@
     </div>
 
 
-  <script src="three.min.js"></script>
-  <script src="OrbitControls.js"></script>
-  <script src="CopyShader.js"></script>
-    <script src="postprocessing/EffectComposer.js"></script>
-    <script src="postprocessing/MaskPass.js"></script>
-    <script src="postprocessing/RenderPass.js"></script>
-    <script src="postprocessing/ShaderPass.js"></script>
+  <script src="resource/js/three.min.js"></script>
+  <script src="resource/js/OrbitControls.js"></script>
+  <script src="resource/js/CopyShader.js"></script>
+    <script src="resource/js/postprocessing/EffectComposer.js"></script>
+    <script src="resource/js/postprocessing/MaskPass.js"></script>
+    <script src="resource/js/postprocessing/RenderPass.js"></script>
+    <script src="resource/js/postprocessing/ShaderPass.js"></script>
 
     <script type="x-shader/x-vertex" id="vshader">
      varying vec2 vUv;
@@ -84,16 +51,16 @@
      varying vec2 vUv;
 
      void main() {
-  vec3 color = vec3(0.5, 0.5, 0.5);
-  color += texture2D(tDiffuse, vUv).xyz * -4.0;
-  color += texture2D(tDiffuse, vUv + vec2(-1.0/512.0, 0.0)).xyz;
-  color += texture2D(tDiffuse, vUv + vec2( 1.0/512.0, 0.0)).xyz;
-  color += texture2D(tDiffuse, vUv + vec2(0.0, -1.0/512.0)).xyz;
-  color += texture2D(tDiffuse, vUv + vec2(0.0,  1.0/512.0)).xyz;
-  color = step(0.55, color);
+        vec3 color = vec3(0.5, 0.5, 0.5);
+        color += texture2D(tDiffuse, vUv).xyz * -4.0;
+        color += texture2D(tDiffuse, vUv + vec2(-1.0/512.0, 0.0)).xyz;
+        color += texture2D(tDiffuse, vUv + vec2( 1.0/512.0, 0.0)).xyz;
+        color += texture2D(tDiffuse, vUv + vec2(0.0, -1.0/512.0)).xyz;
+        color += texture2D(tDiffuse, vUv + vec2(0.0,  1.0/512.0)).xyz;
+        color = step(0.55, color);
 
-  gl_FragColor = vec4(color, 1.0);
-}
+        gl_FragColor = vec4(color, 1.0);
+    }
    </script>
 
 
@@ -105,24 +72,17 @@
 
   var container;
 
-  var img = new Array("test.jpg"　, "test2.jpg", "test3.jpg");
+  var img = new Array("panorama_img/test.jpg"　, "panorama_img/test2.jpg", "panorama_img/test3.jpg");
   var emptyImg = new Array();
   var cnt = 0;
 
-
   for (var i = 0; i < (img.length); i++){
-
-  emptyImg[i] = document.createElement("img");
-
-  /*var emptyImg2 = document.createElement("img");
-  var emptyImg3 = document.createElement("img");*/
-  //emptyImg.src = img[cnt];
-  emptyImg[i].src = img[i];
-
-  /*emptyImg2.src = "test2.jpg";
-  emptyImg3.src = "test3.jpg";*/
-
+    emptyImg[i] = document.createElement("img");
+    emptyImg[i].src = img[i];
   }
+
+  emptyImg[img.length-1].addEventListener('load', handleLoadSuccess);
+
 
 
 
@@ -136,10 +96,13 @@
 	geometry.scale( - 1, 1, 1 );
 
 
-	var material = new THREE.MeshBasicMaterial( {
-    //color: 0xffffff, specular: 0xcccccc, shininess:50, ambient: 0xffffff,
-	   map: THREE.ImageUtils.loadTexture( emptyImg[0].src )
-	} );
+  var material = new THREE.MeshBasicMaterial( {
+      //color: 0xffffff, specular: 0xcccccc, shininess:50, ambient: 0xffffff,
+  	   map: THREE.ImageUtils.loadTexture( emptyImg[0].src )
+  } );
+
+
+
 
 	sphere = new THREE.Mesh( geometry, material );
 
@@ -164,7 +127,10 @@
   renderer.setClearColor({color: 0x000000});
   container = document.getElementById('stage');
   container.appendChild(renderer.domElement);
+
+  var handleLoadSuccess = function(e){
   renderer.render(scene,camera);
+  };
 
   //control
 
@@ -199,20 +165,22 @@
 
     var autochange = document.getElementById("stage_ui_rotate");
     autochange.onclick=function(){
+
       if(controls.autoRotate){
         controls.autoRotate = false;
+        autochange.className="fa fa-play fa-2x";
       }else{
         controls.autoRotate = true;
+        autochange.className="fa fa-pause fa-2x";
       }
     }
+
 
 
     //画像切り替え
 
 
     // selection
-    //var emptyImg = document.createElement("img");
-    //emptyImg.crossOrigin = 'anonymous';
 
     var imagePrev = document.getElementById("stage_ui_prev");
     var imageNext = document.getElementById("stage_ui_next");
@@ -268,28 +236,12 @@
       break;
     case "n":
       cnt == (img.length-1) ? cnt=0 : cnt++;
-      /*if (cnt == (img.length-1)){
-        cnt=0;
-      }else{
-        cnt++;
-      }*/
       break;
     }
     material.map = new THREE.Texture(emptyImg[cnt]);
     material.map.needsUpdate = true;
   }
 
-
-
-  /*function next(){
-    if (cnt == (img.length-1)){
-      cnt=0;
-    }else{
-      cnt++;
-    }
-    material.map = new THREE.Texture(emptyImg[cnt]);
-    material.map.needsUpdate = true;
-  }*/
 
 })();
 

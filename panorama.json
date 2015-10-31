@@ -1,0 +1,16 @@
+{
+    "panoImg" : [
+                {
+                    "name" : "テスト１",
+                    "src":"panorama_img/test.jpg"
+                },
+                {
+                    "name" : "テスト２",
+                    "src":"panorama_img/test2.jpg"
+                },
+                {
+                    "name" : "テスト３",
+                    "src":"panorama_img/test3.jpg"
+                }
+              ]
+}
