@@ -3,6 +3,16 @@ body {
   overflow: hidden;
 }
 
+#loading{
+  color:#FFF;
+  text-align:center;
+  width:100%;
+  visibility:visible;
+  position:absolute;
+  line-height:480px;
+  height:480px;
+}
+
 #stage_ui_area{
   width: 100%;
   height: 32px;

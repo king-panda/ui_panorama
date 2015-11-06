@@ -20,6 +20,7 @@
         <i id="stage_ui_next" class="fa fa-chevron-circle-right fa-2x" title="次の画像"></i>
         <i id="stage_ui_rotate" class="fa fa-pause fa-2x" title="自動回転"></i>
         <i id="stage_ui_full" class="fa fa-arrows-alt fa-2x" title="全画面表示"></i>
+        <i id="stage_ui_cardboard" class="fa fa-columns fa-2x" title="Cardboardで見る"></i>
 
 
       </div>
@@ -30,6 +31,8 @@
 
   <script src="resource/js/three.min.js"></script>
   <script src="resource/js/OrbitControls.js"></script>
+  <script src="DeviceOrientationControls.js"></script>
+  <script src="resource/js/StereoEffect.js"></script>
   <script src="resource/js/CopyShader.js"></script>
     <script src="resource/js/postprocessing/EffectComposer.js"></script>
     <script src="resource/js/postprocessing/MaskPass.js"></script>
@@ -66,6 +69,13 @@
 
   <script>
 (function(){
+
+  var ua = navigator.userAgent;
+   if (ua.indexOf('iPhone') > 0 || ua.indexOf('iPod') > 0 || ua.indexOf('Android') > 0) {
+       var sp = true;
+   }else if(ua.indexOf('iPad') > 0 || ua.indexOf('Android') > 0){
+       var sp = true;
+   }
 
   var width = window.innerWidth,
       height = window.innerHeight;
@@ -134,7 +144,12 @@
 
   //control
 
-  var controls = new THREE.OrbitControls(camera,renderer.domElement);
+  if(sp){
+    var gcontrols = new THREE.DeviceOrientationControls(camera, renderer.domElement);
+  }else{
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  }
+
 
 
 
@@ -176,7 +191,6 @@
     }
 
 
-
     //画像切り替え
 
 
@@ -198,10 +212,20 @@
     ui_r.onclick=function(){
       fullscreen();
     }
-    composer.render();
+    //composer.render();
 
-    //renderer.render(scene,camera);
-    controls.update();
+
+
+    renderer.render(scene,camera);
+
+
+    if(sp){
+      gcontrols.connect();
+      gcontrols.update();
+    }else{
+      controls.update();
+    }
+    //controls.update();
     imagePrev.onclick=function(){
       PrevNext("p");
     }
