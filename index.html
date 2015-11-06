@@ -225,9 +225,11 @@
     }
 
 
-    if(sp && gyro_flag = true){
+    if(sp){
+      if(gyro_flag = true){
       gcontrols.connect();
       gcontrols.update();
+      }
     }else{
       controls.update();
     }
