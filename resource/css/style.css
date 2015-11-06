@@ -3,6 +3,11 @@ body {
   overflow: hidden;
 }
 
+canvas{
+  display: block;
+  position: fixed;
+}
+
 #loading{
   color:#FFF;
   text-align:center;
