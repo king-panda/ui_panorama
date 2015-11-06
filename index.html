@@ -20,7 +20,7 @@
         <i id="stage_ui_next" class="fa fa-chevron-circle-right fa-2x" title="次の画像"></i>
         <i id="stage_ui_rotate" class="fa fa-pause fa-2x" title="自動回転"></i>
         <i id="stage_ui_full" class="fa fa-arrows-alt fa-2x" title="全画面表示"></i>
-        <i id="stage_ui_cardboard" class="fa fa-columns fa-2x" title="Cardboardで見る"></i>
+        <i id="stage_ui_gyro" class="fa fa-columns fa-2x" title="Cardboardで見る"></i>
 
 
       </div>
@@ -31,7 +31,7 @@
 
   <script src="resource/js/three.min.js"></script>
   <script src="resource/js/OrbitControls.js"></script>
-  <script src="DeviceOrientationControls.js"></script>
+  <script src="resource/js/DeviceOrientationControls.js"></script>
   <script src="resource/js/StereoEffect.js"></script>
   <script src="resource/js/CopyShader.js"></script>
     <script src="resource/js/postprocessing/EffectComposer.js"></script>
@@ -215,8 +215,14 @@
     //composer.render();
 
 
-
     renderer.render(scene,camera);
+
+    var autochange = document.getElementById("stage_ui_gyro");
+    var gyro_flag = true;
+
+    ui_r.onclick=function(){
+      gyro_flag = true;
+    }
 
 
     if(sp){
