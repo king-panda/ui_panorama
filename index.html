@@ -217,15 +217,15 @@
 
     renderer.render(scene,camera);
 
-    var autochange = document.getElementById("stage_ui_gyro");
+    var stage_ui_gyro = document.getElementById("stage_ui_gyro");
     var gyro_flag = true;
 
-    ui_r.onclick=function(){
-      gyro_flag = true;
+    stage_ui_gyro.onclick=function(){
+      gyro_flag = false;
     }
 
 
-    if(sp){
+    if(sp && gyro_flag){
       gcontrols.connect();
       gcontrols.update();
     }else{
